@@ -19,14 +19,16 @@ set(LIBRARY_SOURCES
 	src/chumplib.cpp)
 
 include_directories(${PROJECT_SOURCE_DIR}/include)
-add_subdirectory(src)
 add_library(chumplib STATIC ${LIBRARY_SOURCES} ${LIBRARY_HEADERS})
 
 set_target_properties(chumplib PROPERTIES PUBLIC_HEADER include/chumplib.h)
 target_include_directories(chumplib PRIVATE include)
 target_include_directories(chumplib PRIVATE src)
 
-#project(chumpconv VERSION 1.0)
+project(chumpconv VERSION 1.0)
+
+add_executable(chumpconv WIN32 chumpconv/chumpconv.cpp)
+target_link_libraries(chumpconv chumplib)
 
 #add_subdirectory(chumpconv)
 
@@ -34,4 +36,4 @@ target_include_directories(chumplib PRIVATE src)
 #                          "${PROJECT_BINARY_DIR}"
 #                          )
 
-#source_group(chumpconv REGULAR_EXPRESSION chumpconv/*.*)
+source_group(chumpconv REGULAR_EXPRESSION chumpconv/*.*)
