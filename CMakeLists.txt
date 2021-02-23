@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.10)
 
-project(chumplib VERSION 1.0)
+project(ChumpLibrary)
 
 # specify the C++ standard
 set(CMAKE_CXX_STANDARD 11)
@@ -12,23 +12,24 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin")
 
 set(BIN_DIR ${PROJECT_SOURCE_DIR}/bin)
 
-set(LIBRARY_HEADERS
-	include/chumplib.h)
 
-set(LIBRARY_SOURCES
-	src/chumplib.cpp)
+add_subdirectory(chumpconv)
 
-include_directories(${PROJECT_SOURCE_DIR}/include)
-add_library(chumplib STATIC ${LIBRARY_SOURCES} ${LIBRARY_HEADERS})
+#source_group(chumpconv REGULAR_EXPRESSION chumpconv/*.*)
 
-set_target_properties(chumplib PROPERTIES PUBLIC_HEADER include/chumplib.h)
-target_include_directories(chumplib PRIVATE include)
-target_include_directories(chumplib PRIVATE src)
+
+add_subdirectory(chumplib)
+
+include_directories(${PROJECT_SOURCE_DIR}/chumplib/include)
+
+
+
+#source_group(chumplib REGULAR_EXPRESSION src/*.*)
+
+#target_include_directories(chumplib PRIVATE src)
+
 #add_subdirectory(src)
 
-#project(chumpconv VERSION 1.0)
-
-#add_subdirectory(chumpconv)
 
 #add_subdirectory(chumpconv)
 
@@ -36,4 +37,3 @@ target_include_directories(chumplib PRIVATE src)
 #                          "${PROJECT_BINARY_DIR}"
 #                          )
 
-#source_group(chumpconv REGULAR_EXPRESSION chumpconv/*.*)
