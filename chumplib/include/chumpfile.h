@@ -169,10 +169,12 @@ private:
 
     std::vector<ChumpChunk> rootData;
 
-    ChumpFile() { }
-
     bool Serialize(class IOArchive& Ar);
 public:
     static ChumpFile read(const char* path);
+
+    void save(const char* path);
+
+    ChumpFile() { }
 };
 #endif // _CHUMPFILE_H_

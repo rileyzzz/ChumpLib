@@ -12,6 +12,13 @@ ChumpFile ChumpFile::read(const char* path)
     return newFile;
 }
 
+void ChumpFile::save(const char* path)
+{
+    IOArchive Ar(path, IODirection::Export);
+	if(!Serialize(Ar))
+		std::cout << "Encountered file write error at offset " << Ar.tellg() << "\n";
+}
+
 bool ChumpFile::Serialize(IOArchive& Ar)
 {
     if(!Ar.ChunkHeader("ACS$"))
