@@ -56,10 +56,10 @@ public:
 class ChumpInteger : public ChumpData
 {
 private:
-    int32_t value;
+    std::vector<int32_t> values;
 
     //private constructor
-    ChumpInteger(): value(0) { }
+    ChumpInteger() { }
 
 public:
     bool Serialize(class IOArchive& Ar, size_t datasize);
@@ -70,10 +70,10 @@ public:
 class ChumpFloat : public ChumpData
 {
 private:
-    float value;
+    std::vector<float> values;
 
     //private constructor
-    ChumpFloat() : value(0.0f) { }
+    ChumpFloat() { }
 
 public:
     bool Serialize(class IOArchive& Ar, size_t datasize);
@@ -121,7 +121,7 @@ public:
 };
 
 //https://github.com/SilverGreen93/CDPExplorer/blob/master/kuid-format.md
-#pragma pack(push, 1)
+#pragma pack(1)
 struct KUIDdata
 {
     int32_t userid : 25;
@@ -130,7 +130,7 @@ struct KUIDdata
 
     KUIDdata() : version(0), userid(0), contentid(0) {}
 };
-#pragma pack(pop)
+#pragma pack()
 
 class ChumpKUID : public ChumpData
 {

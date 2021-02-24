@@ -27,6 +27,7 @@ bool ChumpFile::Serialize(IOArchive& Ar)
     std::cout << filelength << "\n";
 
     std::streampos dataStart = Ar.tellg();
+    std::cout << "datastart " << dataStart << "\n";
 
     if (Ar.IsLoading())
     {
@@ -82,7 +83,7 @@ bool ChumpChunk::Serialize(IOArchive& Ar)
     SerializeString(Ar, chunkName);
     Ar << chunkType;
 
-    //std::cout << "data begin " << Ar.tellg() << " name " << chunkName << " type " << (int)chunkType << "\n";
+    //std::cout << "data begin " << (int)Ar.tellg() << " name " << chunkName << " type " << (int)chunkType << "\n";
 
     if (Ar.IsLoading())
     {
@@ -161,19 +162,34 @@ bool ChumpSoup::Serialize(IOArchive& Ar, size_t datasize)
 
 bool ChumpInteger::Serialize(IOArchive& Ar, size_t datasize)
 {
-    Ar << value;
+    std::streampos dataStart = Ar.tellg();
+
+    if(Ar.IsLoading())
+        values.resize(datasize / sizeof(int32_t));
+
+    Ar.Serialize(values.data(), datasize);
 
     //std::cout << "int data " << value << "\n";
-    std::cout << value << "\n";
+    for(const auto& value : values)
+        std::cout << value << ", ";
+    std::cout << "\n";
     return true;
 }
 
 bool ChumpFloat::Serialize(IOArchive& Ar, size_t datasize)
 {
-    Ar << value;
+    std::streampos dataStart = Ar.tellg();
+
+    if(Ar.IsLoading())
+        values.resize(datasize / sizeof(float));
+
+    Ar.Serialize(values.data(), datasize);
 
     //std::cout << "float data " << value << "\n";
-    std::cout << value << "\n";
+        for(const auto& value : values)
+        std::cout << value << ", ";
+    std::cout << "\n";
+
     return true;
 }
 
@@ -215,7 +231,10 @@ bool ChumpRaw::Serialize(IOArchive& Ar, size_t datasize)
 
 bool ChumpKUID::Serialize(IOArchive& Ar, size_t datasize)
 {
-    Ar << KUID;
+    //Ar << KUID;
+    Ar.Serialize(&KUID, 8);
+
+    //std::cout << "kuidsize " << sizeof(KUIDdata) << "\n";
     //std::cout << "kuid data userid " << (int)KUID.userid << " contentid " << (int)KUID.contentid << " version " << (int)KUID.version << "\n";
     std::cout << "userid " << (int)KUID.userid << " contentid " << (int)KUID.contentid << " version " << (int)KUID.version << "\n";
     return true;
