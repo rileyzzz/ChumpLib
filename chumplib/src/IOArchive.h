@@ -108,8 +108,12 @@ public:
 
 	std::streampos tellg()
 	{
-		assert(IsLoading());
-		return input.tellg();
+	    if(IsLoading())
+            return input.tellg();
+        else
+            return output.tellp();
+		//assert(IsLoading());
+		//return input.tellg();
 	}
 
 	std::streamsize GetFilesize()
