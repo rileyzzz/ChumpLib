@@ -94,6 +94,7 @@ int main(int argc, char* argv[])
         ChumpChunk testChunk("key");
         testChunk.setData(std::make_shared<ChumpText>("value"));
         testfile.rootData.push_back(testChunk);
+        //testfile.rootData.push_back(ChumpChunk);
         testfile.save(argv[2]);
         return 0;
     }

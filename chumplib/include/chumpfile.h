@@ -221,6 +221,8 @@ public:
     inline void setData(std::shared_ptr<ChumpKUID> in_data)        { chunkType = ChumpDataType::KUID; data = in_data; }
 
     ChumpChunk(std::string name) : chunkName(name) { }
+    ChumpChunk(std::string name, std::shared_ptr<ChumpData> in_data) : chunkName(name), data(in_data) { }
+
     friend class ChumpSoup;
     friend class ChumpFile;
 };
