@@ -1,5 +1,7 @@
 #include <iostream>
 #include <fstream>
+#include <filesystem>
+#include <cstring>
 #include <chumplib.h>
 
 void writeChunk(std::ofstream& str, ChumpChunk& chnk, int indentLevel = 0)
@@ -84,20 +86,33 @@ int main(int argc, char* argv[])
     if(argc == 1)
     {
         std::cout << "USAGE: chumpconv config.chump\n";
-        //return 0;
+        return 0;
+    }
+    if(argc > 2 && strcmp(argv[1], "test") == 0)
+    {
+        ChumpFile testfile;
+        ChumpChunk testChunk("key");
+        testChunk.setData(std::make_shared<ChumpText>("value"));
+        testfile.rootData.push_back(testChunk);
+        testfile.save(argv[2]);
+        return 0;
     }
     //const char* filename = argv[1];
+    std::filesystem::path filepath(argv[1]);
+    std::string outpath = filepath.replace_extension("config.txt").string();
 
     //chump_read("C:/Users/10447696/Desktop/TRS19/Install/resources/builtin/46400/config-cache.chump");
     //chump_read("E:/Program Files/N3V Games/Trainz Railroad Simulator 2019/resources/builtin/46400/config-cache.chump");
     //auto test = chump_read("C:/Users/riley/Desktop/Trainz/trainzcore/kuid2 414976 102484 2/config.chump");
     //auto test = chump_read("E:/Program Files/N3V Games/Trainz Railroad Simulator 2019/resources/builtin/46400/config-cache.chump");
 
-    auto test = chump_read("C:/Users/10447696/Desktop/TRS19/Install/resources/builtin/46400/config-cache.chump");
+    //auto test = chump_read("C:/Users/10447696/Desktop/TRS19/Install/resources/builtin/46400/config-cache.chump");
+    auto test = chump_read(argv[1]);
 
-    std::ofstream out("C:/Users/10447696/Desktop/TRS19/Install/resources/builtin/46400/config-cache.config.txt", std::ofstream::out);
+    std::ofstream out(outpath.c_str(), std::ofstream::out);
     writeConfig(out, test);
     out.close();
+
     //test.save("C:/Users/riley/Desktop/Trainz/trainzcore/kuid2 414976 102484 2/config2.chump");
     //getchar();
 

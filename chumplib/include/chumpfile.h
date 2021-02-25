@@ -70,6 +70,9 @@ public:
     bool Serialize(class IOArchive& Ar, size_t datasize);
     int size() { return values.size() * sizeof(int32_t); }
 
+    ChumpInteger(int val) { values.push_back(val); }
+    ChumpInteger(std::vector<int32_t> val) { values = val; }
+
     friend class ChumpChunk;
 };
 
@@ -86,6 +89,9 @@ public:
     bool Serialize(class IOArchive& Ar, size_t datasize);
     int size() { return values.size() * sizeof(float); }
 
+    ChumpFloat(float val) { values.push_back(val); }
+    ChumpFloat(std::vector<float> val) { values = val; }
+
     friend class ChumpChunk;
 };
 
@@ -101,6 +107,8 @@ private:
 public:
     bool Serialize(class IOArchive& Ar, size_t datasize);
     int size() { return value.size() + 1; }
+
+    ChumpText(std::string val) { value = val; }
 
     friend class ChumpChunk;
 };
@@ -189,13 +197,25 @@ private:
     ChumpDataType chunkType;
     std::shared_ptr<ChumpData> data;
 
+    ChumpChunk() { }
 public:
     bool Serialize(class IOArchive& Ar);
     int size();
 
     std::shared_ptr<ChumpData> getData() { return data; }
     const ChumpDataType getChunkType() { return chunkType; }
+
+    inline void setData(std::shared_ptr<ChumpSoup> in_data)        { chunkType = ChumpDataType::Soup; data = in_data; }
+    inline void setData(std::shared_ptr<ChumpInteger> in_data)     { chunkType = ChumpDataType::Integer; data = in_data; }
+    inline void setData(std::shared_ptr<ChumpFloat> in_data)       { chunkType = ChumpDataType::Float; data = in_data; }     
+    inline void setData(std::shared_ptr<ChumpText> in_data)        { chunkType = ChumpDataType::Text; data = in_data; }
+    inline void setData(std::shared_ptr<ChumpRaw> in_data)         { chunkType = ChumpDataType::Raw; data = in_data; }
+    inline void setData(std::shared_ptr<ChumpNull> in_data)        { chunkType = ChumpDataType::Null; data = in_data; }
+    inline void setData(std::shared_ptr<ChumpKUID> in_data)        { chunkType = ChumpDataType::KUID; data = in_data; }
+
+    ChumpChunk(std::string name) : chunkName(name) { }
     friend class ChumpSoup;
+    friend class ChumpFile;
 };
 
 
