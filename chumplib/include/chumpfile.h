@@ -138,7 +138,7 @@ public:
     };
     union
     {
-        unsigned contentid : 32;
+        signed contentid : 32;
         uint32_t _low;
     };
 #pragma pack()
