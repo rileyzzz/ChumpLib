@@ -169,6 +169,9 @@ public:
     {
         return std::string() + "<kuid" + (version > 0 ? "2:" : ":") + std::to_string(userid) + ":" + std::to_string(contentid) + ((version > 0) ? (":" + std::to_string(version)) : "") + ">";
     }
+
+    KUIDdata(int32_t in_userid, int32_t in_contentid, uint8_t in_revision = 0)
+        : userid(in_userid), contentid(in_contentid), version(in_revision) { }
     friend class ChumpKUID;
 };
 
@@ -184,6 +187,9 @@ private:
 public:
     bool Serialize(class IOArchive& Ar, size_t datasize);
     int size() { return 8; }
+
+    ChumpKUID(int32_t userid, int32_t contentid, uint8_t revision = 0) : KUID(userid, contentid, revision) { }
+
     friend class ChumpChunk;
 };
 
