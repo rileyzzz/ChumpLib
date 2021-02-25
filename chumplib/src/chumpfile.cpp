@@ -1,4 +1,5 @@
 #include <iostream>
+#include <bitset>
 #include "chumpfile.h"
 #include "IOArchive.h"
 
@@ -238,11 +239,19 @@ bool ChumpRaw::Serialize(IOArchive& Ar, size_t datasize)
 
 bool ChumpKUID::Serialize(IOArchive& Ar, size_t datasize)
 {
-    //Ar << KUID;
-    Ar.Serialize(&KUID, 8);
+    //Ar << KUID._raw;
+    //sizeof(KUID._raw);
+    Ar << KUID._high;
+    Ar << KUID._low;
 
     //std::cout << "kuidsize " << sizeof(KUIDdata) << "\n";
     //std::cout << "kuid data userid " << (int)KUID.userid << " contentid " << (int)KUID.contentid << " version " << (int)KUID.version << "\n";
-    std::cout << "userid " << (int)KUID.userid << " contentid " << (int)KUID.contentid << " version " << (int)KUID.version << "\n";
+    //std::cout << "userid " << (int)KUID.userid << " contentid " << (int)KUID.contentid << " version " << (int)KUID.version << "\n";
+    //std::cout << std::bitset<7>(KUID.version) << "\n";
+    //std::cout << std::bitset<32>(KUID._high) << "\n";
+    //std::cout << std::bitset<25>(KUID.userid) << "\n";
+    //std::cout << std::bitset<7>(KUID.version) << "\n";
+    //std::cout << std::bitset<32>(KUID._low) << "\n";
+    std::cout << KUID.KUIDstr();
     return true;
 }

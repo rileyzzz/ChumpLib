@@ -5,10 +5,10 @@
 CHUMPLIB_API void chump_read(const char* file)
 {
 	std::cout << "neato\n";
-	//ChumpFile::read(file);
-    ChumpFile test;
+	ChumpFile::read(file);
+    //ChumpFile test;
     //test.save("/workspace/ChumpLib/build/bin/test.chump");
-    test.save("C:/Users/10447696/Desktop/CB/projects/ChumpLib/test.chump");
+    //test.save("C:/Users/10447696/Desktop/CB/projects/ChumpLib/test.chump");
 
 	//MessageBoxA(0, "done", "done", MB_OK);
 }

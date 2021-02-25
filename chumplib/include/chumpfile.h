@@ -1,6 +1,7 @@
 #include <iostream>
 #include <vector>
 #include <memory>
+#include <string>
 
 #ifndef _CHUMPFILE_H_
 #define _CHUMPFILE_H_
@@ -121,16 +122,34 @@ public:
 };
 
 //https://github.com/SilverGreen93/CDPExplorer/blob/master/kuid-format.md
-#pragma pack(1)
+
 struct KUIDdata
 {
-    int32_t userid : 25;
-    int32_t contentid : 32;
-    uint8_t version : 7;
-
-    KUIDdata() : version(0), userid(0), contentid(0) {}
-};
+public:
+#pragma pack(1)
+    union
+    {
+        struct
+        {
+            signed userid : 25;
+            unsigned version : 7;
+        };
+        uint32_t _high;
+    };
+    union
+    {
+        unsigned contentid : 32;
+        uint32_t _low;
+    };
 #pragma pack()
+public:
+    KUIDdata() : _high(0), _low(0) {}
+    inline std::string KUIDstr()
+    {
+        return std::string() + "<kuid" + (version > 0 ? "2:" : ":") + std::to_string(userid) + ":" + std::to_string(contentid) + ((version > 0) ? (":" + std::to_string(version)) : "") + ">";
+    }
+    friend class ChumpKUID;
+};
 
 class ChumpKUID : public ChumpData
 {
