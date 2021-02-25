@@ -54,6 +54,7 @@ public:
     bool Serialize(class IOArchive& Ar, size_t datasize);
     int size();
 
+    ChumpSoup(std::vector<ChumpChunk> chunks) : children(chunks) { }
     friend class ChumpChunk;
 };
 
@@ -71,7 +72,7 @@ public:
     int size() { return values.size() * sizeof(int32_t); }
 
     ChumpInteger(int val) { values.push_back(val); }
-    ChumpInteger(std::vector<int32_t> val) { values = val; }
+    ChumpInteger(std::vector<int32_t> val) : values(val) { }
 
     friend class ChumpChunk;
 };
@@ -90,7 +91,7 @@ public:
     int size() { return values.size() * sizeof(float); }
 
     ChumpFloat(float val) { values.push_back(val); }
-    ChumpFloat(std::vector<float> val) { values = val; }
+    ChumpFloat(std::vector<float> val) : values(val) { }
 
     friend class ChumpChunk;
 };
@@ -108,7 +109,7 @@ public:
     bool Serialize(class IOArchive& Ar, size_t datasize);
     int size() { return value.size() + 1; }
 
-    ChumpText(std::string val) { value = val; }
+    ChumpText(std::string val) : value(val) { }
 
     friend class ChumpChunk;
 };
