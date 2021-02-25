@@ -43,9 +43,10 @@ public:
 
 class ChumpSoup : public ChumpData
 {
-private:
+public:
     std::vector<ChumpChunk> children;
 
+private:
     //private constructor
     ChumpSoup() {}
 
@@ -58,9 +59,10 @@ public:
 
 class ChumpInteger : public ChumpData
 {
-private:
+public:
     std::vector<int32_t> values;
 
+private:
     //private constructor
     ChumpInteger() { }
 
@@ -73,9 +75,10 @@ public:
 
 class ChumpFloat : public ChumpData
 {
-private:
+public:
     std::vector<float> values;
 
+private:
     //private constructor
     ChumpFloat() { }
 
@@ -88,9 +91,10 @@ public:
 
 class ChumpText : public ChumpData
 {
-private:
+public:
     std::string value;
 
+private:
     //private constructor
     ChumpText() { }
 
@@ -103,7 +107,9 @@ public:
 
 class ChumpRaw : public ChumpData
 {
+public:
     std::vector<int8_t> rawdata;
+
 private:
     //private constructor
     ChumpRaw() { }
@@ -160,8 +166,10 @@ public:
 
 class ChumpKUID : public ChumpData
 {
-private:
+public:
     KUIDdata KUID;
+
+private:
     //private constructor
     ChumpKUID() { }
 
@@ -174,28 +182,31 @@ public:
 
 class ChumpChunk
 {
-private:
+public:
     std::string chunkName;
-    ChumpDataType chunkType;
 
+private:
+    ChumpDataType chunkType;
     std::shared_ptr<ChumpData> data;
 
 public:
     bool Serialize(class IOArchive& Ar);
     int size();
 
+    std::shared_ptr<ChumpData> getData() { return data; }
+    const ChumpDataType getChunkType() { return chunkType; }
     friend class ChumpSoup;
 };
 
 
 class ChumpFile
 {
-private:
+public:
+    std::vector<ChumpChunk> rootData;
 
+private:
     uint32_t version = 1;
     uint32_t padding0 = 0;
-
-    std::vector<ChumpChunk> rootData;
 
     bool Serialize(class IOArchive& Ar);
 public:

@@ -4,7 +4,6 @@
 
 CHUMPLIB_API ChumpFile chump_read(const char* file)
 {
-	std::cout << "neato\n";
 	return ChumpFile::read(file);
     //ChumpFile test;
     //test.save("/workspace/ChumpLib/build/bin/test.chump");
