@@ -30,6 +30,7 @@ private:
 
 public:
     virtual bool Serialize(class IOArchive& Ar, size_t datasize) = 0;
+    virtual int size() = 0;
 
     friend class ChumpSoup;
     friend class ChumpInteger;
@@ -50,6 +51,7 @@ private:
 
 public:
     bool Serialize(class IOArchive& Ar, size_t datasize);
+    int size();
 
     friend class ChumpChunk;
 };
@@ -64,6 +66,7 @@ private:
 
 public:
     bool Serialize(class IOArchive& Ar, size_t datasize);
+    int size() { return values.size() * sizeof(int32_t); }
 
     friend class ChumpChunk;
 };
@@ -78,6 +81,7 @@ private:
 
 public:
     bool Serialize(class IOArchive& Ar, size_t datasize);
+    int size() { return values.size() * sizeof(float); }
 
     friend class ChumpChunk;
 };
@@ -92,6 +96,7 @@ private:
 
 public:
     bool Serialize(class IOArchive& Ar, size_t datasize);
+    int size() { return value.size() + 1; }
 
     friend class ChumpChunk;
 };
@@ -105,6 +110,7 @@ private:
 
 public:
     bool Serialize(class IOArchive& Ar, size_t datasize);
+    int size() { return rawdata.size(); }
 
     friend class ChumpChunk;
 };
@@ -117,6 +123,7 @@ private:
 
 public:
     bool Serialize(class IOArchive& Ar, size_t datasize) { return true; }
+    int size() { return 0; }
 
     friend class ChumpChunk;
 };
@@ -160,7 +167,7 @@ private:
 
 public:
     bool Serialize(class IOArchive& Ar, size_t datasize);
-
+    int size() { return 8; }
     friend class ChumpChunk;
 };
 
@@ -175,7 +182,9 @@ private:
 
 public:
     bool Serialize(class IOArchive& Ar);
+    int size();
 
+    friend class ChumpSoup;
 };
 
 

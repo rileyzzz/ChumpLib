@@ -14,6 +14,6 @@
 #define CHUMPLIB_API
 #endif
 
-extern "C" CHUMPLIB_API void chump_read(const char* file);
+extern "C++" CHUMPLIB_API ChumpFile chump_read(const char* file);
 
 #endif //_CHUMPLIB_H_

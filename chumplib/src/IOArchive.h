@@ -106,14 +106,23 @@ public:
 		return true;
 	}
 
-	std::streampos tellg()
+	std::streampos tell()
 	{
 	    if(IsLoading())
             return input.tellg();
         else
             return output.tellp();
+
 		//assert(IsLoading());
 		//return input.tellg();
+	}
+
+	void seek(std::streampos pos, std::ios::seekdir dir = std::ios::beg)
+	{
+		if (IsLoading())
+			input.seekg(pos, dir);
+		else
+			output.seekp(pos, dir);
 	}
 
 	std::streamsize GetFilesize()

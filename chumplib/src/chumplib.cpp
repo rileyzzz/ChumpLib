@@ -2,10 +2,10 @@
 #include <iostream>
 //#include <windows.h>
 
-CHUMPLIB_API void chump_read(const char* file)
+CHUMPLIB_API ChumpFile chump_read(const char* file)
 {
 	std::cout << "neato\n";
-	ChumpFile::read(file);
+	return ChumpFile::read(file);
     //ChumpFile test;
     //test.save("/workspace/ChumpLib/build/bin/test.chump");
     //test.save("C:/Users/10447696/Desktop/CB/projects/ChumpLib/test.chump");

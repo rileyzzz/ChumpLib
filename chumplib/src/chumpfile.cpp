@@ -8,7 +8,7 @@ ChumpFile ChumpFile::read(const char* path)
     ChumpFile newFile;
     IOArchive Ar(path, IODirection::Import);
 	if(!newFile.Serialize(Ar))
-		std::cout << "Encountered file read error at offset " << Ar.tellg() << "\n";
+		std::cout << "Encountered file read error at offset " << Ar.tell() << "\n";
 
     return newFile;
 }
@@ -17,7 +17,7 @@ void ChumpFile::save(const char* path)
 {
     IOArchive Ar(path, IODirection::Export);
 	if(!Serialize(Ar))
-		std::cout << "Encountered file write error at offset " << Ar.tellg() << "\n";
+		std::cout << "Encountered file write error at offset " << Ar.tell() << "\n";
 }
 
 bool ChumpFile::Serialize(IOArchive& Ar)
@@ -30,16 +30,21 @@ bool ChumpFile::Serialize(IOArchive& Ar)
 
     //use tellg etc after serialization to replace this value when saving
     int32_t filelength = 0;
+    if (Ar.IsSaving())
+    {
+        for (auto& child : rootData)
+            filelength += child.size();
+    }
     Ar << filelength;
 
-    std::cout << filelength << "\n";
+    //std::cout << "filelength " << filelength << "\n";
 
-    std::streampos dataStart = Ar.tellg();
-    std::cout << "datastart " << dataStart << "\n";
+    std::streampos dataStart = Ar.tell();
+    //std::cout << "datastart " << dataStart << "\n";
 
     if (Ar.IsLoading())
     {
-        while ((size_t)(Ar.tellg() - dataStart) < filelength)
+        while ((size_t)(Ar.tell() - dataStart) < filelength)
         {
             ChumpChunk newChunk;
             if (!newChunk.Serialize(Ar))
@@ -64,33 +69,50 @@ bool ChumpFile::Serialize(IOArchive& Ar)
 
 void SerializeString(IOArchive& Ar, std::string& str)
 {
-    uint8_t strLength = str.size();
+    uint8_t strLength = str.size() + 1;
     Ar << strLength;
-    char* strData = new char[strLength] {}; //initialize to 0
-
-    if (Ar.IsSaving())
-        strcpy(strData, str.data());
-
-    Ar.Serialize(strData, strLength);
 
     if (Ar.IsLoading())
+    {
+        char* strData = new char[strLength] {};
+        Ar.Serialize(strData, strLength);
         str = strData;
-
-    delete[] strData;
+        delete[] strData;
+    }
+    else
+    {
+        Ar.Serialize(str.data(), std::streamsize(strLength));
+    }
 }
 
+int ChumpChunk::size()
+{
+    int chunkSize = 0;
+    chunkSize += sizeof(int32_t); //pairlength
+    chunkSize += chunkName.size() + 2;
+    chunkSize += 1; //chunkType
+    chunkSize += data->size();
+    return chunkSize;
+}
 
 bool ChumpChunk::Serialize(IOArchive& Ar)
 {
-    //std::cout << "chunk start " << Ar.tellg() << "\n";
+    //std::cout << "chunk start " << Ar.tell() << "\n";
+
     int32_t pairLength = 0;
+    if (Ar.IsSaving())
+    {
+        pairLength += chunkName.size() + 2;
+        pairLength += 1; //chunkType
+        pairLength += data->size();
+    }
     Ar << pairLength;
 
-    std::streampos pairStart = Ar.tellg();
+    std::streampos pairStart = Ar.tell();
 
     SerializeString(Ar, chunkName);
     Ar << chunkType;
-
+    
     //std::cout << "data begin " << (int)Ar.tellg() << " name " << chunkName << " type " << (int)chunkType << "\n";
 
     if (Ar.IsLoading())
@@ -130,21 +152,23 @@ bool ChumpChunk::Serialize(IOArchive& Ar)
     //std::cout << "read chunk " << chunkName << " type " << (int)chunkType << "\n";
 
     assert(data);
-    int dataLeft = pairLength - (Ar.tellg() - pairStart);
+    int dataLeft = pairLength - (Ar.tell() - pairStart);
     //std::cout << "data left " << dataLeft << "\n";
-    if(dataLeft > 0)
+    if(dataLeft > 0 || Ar.IsSaving())
         data->Serialize(Ar, dataLeft);
+
+    //std::cout << "chunk length " + std::to_string(size()) << " actual " + std::to_string(pairLength + 4) << "\n";
 
     return true;
 }
 
 bool ChumpSoup::Serialize(IOArchive& Ar, size_t datasize)
 {
-    std::streampos pairStart = Ar.tellg();
+    std::streampos pairStart = Ar.tell();
 
     if (Ar.IsLoading())
     {
-        while (Ar.tellg() - pairStart < datasize)
+        while (Ar.tell() - pairStart < datasize)
         {
             ChumpChunk newChunk;
             if(!newChunk.Serialize(Ar))
@@ -168,15 +192,28 @@ bool ChumpSoup::Serialize(IOArchive& Ar, size_t datasize)
     return true;
 }
 
+int ChumpSoup::size()
+{
+    int size = 0;
+    for (auto& child : children)
+        size += child.size();
+
+    return size;
+}
+
 bool ChumpInteger::Serialize(IOArchive& Ar, size_t datasize)
 {
-    std::streampos dataStart = Ar.tellg();
+    std::streampos dataStart = Ar.tell();
 
-    if(Ar.IsLoading())
+    if (Ar.IsLoading())
+    {
         values.resize(datasize / sizeof(int32_t));
-
-    Ar.Serialize(values.data(), datasize);
-
+        Ar.Serialize(values.data(), datasize);
+    }
+    else
+    {
+        Ar.Serialize(values.data(), values.size() * sizeof(int32_t));
+    }
     //std::cout << "int data " << value << "\n";
     for(const auto& value : values)
         std::cout << value << ", ";
@@ -186,12 +223,17 @@ bool ChumpInteger::Serialize(IOArchive& Ar, size_t datasize)
 
 bool ChumpFloat::Serialize(IOArchive& Ar, size_t datasize)
 {
-    std::streampos dataStart = Ar.tellg();
+    std::streampos dataStart = Ar.tell();
 
-    if(Ar.IsLoading())
+    if (Ar.IsLoading())
+    {
         values.resize(datasize / sizeof(float));
-
-    Ar.Serialize(values.data(), datasize);
+        Ar.Serialize(values.data(), datasize);
+    }
+    else
+    {
+        Ar.Serialize(values.data(), values.size() * sizeof(float));
+    }
 
     //std::cout << "float data " << value << "\n";
         for(const auto& value : values)
@@ -203,24 +245,17 @@ bool ChumpFloat::Serialize(IOArchive& Ar, size_t datasize)
 
 bool ChumpText::Serialize(IOArchive& Ar, size_t datasize)
 {
-    char* str;
-
     if (Ar.IsLoading())
     {
-        str = new char[datasize];
+        char* str = new char[datasize];
+        Ar.Serialize(str, datasize);
+        value = str;
+        delete[] str;
     }
     else
     {
-        str = new char[value.size()];
-        strcpy(str, value.data());
+        Ar.Serialize(value.data(), value.size() + 1);
     }
-
-    Ar.Serialize(str, datasize);
-
-    if (Ar.IsLoading())
-        value = str;
-
-    delete[] str;
 
     //std::cout << "text data " << value << "\n";
     std::cout << value << "\n";
@@ -252,6 +287,6 @@ bool ChumpKUID::Serialize(IOArchive& Ar, size_t datasize)
     //std::cout << std::bitset<25>(KUID.userid) << "\n";
     //std::cout << std::bitset<7>(KUID.version) << "\n";
     //std::cout << std::bitset<32>(KUID._low) << "\n";
-    std::cout << KUID.KUIDstr();
+    std::cout << KUID.KUIDstr() << "\n";
     return true;
 }
