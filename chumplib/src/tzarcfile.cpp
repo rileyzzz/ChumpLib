@@ -13,9 +13,9 @@
 #include "tzarcfile.h"
 #include "IOArchive.h"
 
-TZarcFile TZarcFile::read(const char* path)
+TZArchive TZArchive::read(const char* path)
 {
-    TZarcFile newFile;
+    TZArchive newFile;
     IOArchive Ar(path, IODirection::Import);
 	if(!newFile.Serialize(Ar))
 		std::cout << "Encountered file read error at offset " << Ar.tell() << "\n";
@@ -23,7 +23,25 @@ TZarcFile TZarcFile::read(const char* path)
     return newFile;
 }
 
-bool TZarcFile::Serialize(IOArchive& Ar)
+void SerializeCondensedString(IOArchive& Ar, std::string& str)
+{
+    uint8_t strLength = str.size();
+    Ar << strLength;
+
+    if (Ar.IsLoading())
+    {
+        char* strData = new char[strLength + 1] {};
+        Ar.Serialize(strData, strLength);
+        str = strData;
+        delete[] strData;
+    }
+    else
+    {
+        Ar.Serialize(str.data(), std::streamsize(strLength));
+    }
+}
+
+bool TZArchive::Serialize(IOArchive& Ar)
 {
     if(!Ar.ChunkHeader("TZac"))
         return false;
@@ -45,7 +63,23 @@ bool TZarcFile::Serialize(IOArchive& Ar)
     for(int i = 0; i < filecount; i++)
     {
         auto& file = files[i];
+        SerializeCondensedString(Ar, file.name);
+        uint32_t unknown = 0;
+        Ar << unknown;
 
+        file.filesize = bswap_32(file.filesize);
+        Ar << file.filesize;
+        file.filesize = bswap_32(file.filesize);
+
+        std::cout << "file " << file.name << " size " << file.filesize << "\n";
+    }
+
+    //read file data
+    for(int i = 0; i < filecount; i++)
+    {
+        auto& file = files[i];
+        file.filedata = new uint8_t[file.filesize];
+        
     }
     return true;
 }

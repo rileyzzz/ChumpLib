@@ -8,25 +8,32 @@
 
 class IOArchive;
 
-class TZarcObj
+class TZArcFile
 {
+private:
+    std::string name;
+    uint32_t filesize;
+    uint8_t* filedata;
 
+    TZArcFile() : filesize(0), filedata(nullptr) {}
+
+    friend class TZArchive;
 };
 
-class TZarcFile
+class TZArchive
 {
 public:
-    std::vector<TZarcObj> files;
+    std::vector<TZArcFile> files;
 
 private:
     uint32_t version = 1;
 
     bool Serialize(class IOArchive& Ar);
 public:
-    static TZarcFile read(const char* path);
+    static TZArchive read(const char* path);
 
     void save(const char* path);
 
-    TZARCFile() { }
+    TZArchive() { }
 };
 #endif // _TZARCFILE_H_

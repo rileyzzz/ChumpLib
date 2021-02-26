@@ -16,6 +16,6 @@
 #endif
 
 extern "C++" CHUMPLIB_API ChumpFile chump_read(const char* file);
-extern "C++" CHUMPLIB_API TZarcFile tzarc_read(const char* file);
+extern "C++" CHUMPLIB_API TZArchive tzarc_read(const char* file);
 
 #endif //_CHUMPLIB_H_
