@@ -10,12 +10,14 @@ class IOArchive;
 
 class TZArcFile
 {
-private:
+public:
     std::string name;
     uint32_t filesize;
-    uint8_t* filedata;
+    char* filedata;
 
+public:
     TZArcFile() : filesize(0), filedata(nullptr) {}
+    ~TZArcFile() { delete[] filedata; }
 
     friend class TZArchive;
 };

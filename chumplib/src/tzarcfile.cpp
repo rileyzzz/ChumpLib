@@ -74,12 +74,16 @@ bool TZArchive::Serialize(IOArchive& Ar)
         std::cout << "file " << file.name << " size " << file.filesize << "\n";
     }
 
+    uint32_t unknown2 = 0;
+    Ar << unknown2;
+
     //read file data
     for(int i = 0; i < filecount; i++)
     {
         auto& file = files[i];
-        file.filedata = new uint8_t[file.filesize];
-        
+        file.filedata = new char[file.filesize];
+        Ar.Serialize(file.filedata, file.filesize);
+        std::cout << "read file data for " << file.name << ", fstream position " << Ar.tell() << "\n";
     }
     return true;
 }

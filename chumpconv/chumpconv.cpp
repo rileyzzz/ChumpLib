@@ -2,6 +2,15 @@
 #include <fstream>
 //#include <filesystem>
 //#include <experimental/filesystem>
+#include <sys/stat.h>
+
+#ifdef WIN_32
+#include <direct.h>
+#define mkdir(x) _mkdir(x)
+#else
+#define mkdir(x) mkdir(x, 0755)
+#endif
+
 #include <cstring>
 #include <chumplib.h>
 
@@ -97,9 +106,21 @@ void writeConfig(std::ofstream& str, ChumpFile& file)
 
 int main(int argc, char* argv[])
 {
-    //tzarc_read("C:/Users/10447696/Desktop/TRS19/Install/resources/builtin/46472/content/kuid2 661281 200019 8.tzarc");
-    tzarc_read(argv[1]);
-    return 0;
+    // auto arc = tzarc_read(argv[1]);
+    // std::string outdir = argv[1];
+    // outdir = outdir.substr(0, outdir.find_last_of('.'));
+    // mkdir(outdir.c_str());
+
+    // std::cout << "read finished\n";
+    // for(const auto& file : arc.files)
+    // {
+    //     std::string fpath = outdir + "/" + file.name;
+    //     std::cout << "write to " << fpath << "\n";
+    //     std::ofstream out(fpath.c_str(), std::ofstream::out);
+    //     out.write(file.filedata, file.filesize);
+    //     out.close();
+    // }
+    // return 0;
 
     if(argc == 1)
     {
