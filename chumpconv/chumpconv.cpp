@@ -6,15 +6,28 @@
 
 void writeChunk(std::ofstream& str, ChumpChunk& chnk, int indentLevel = 0)
 {
-    const std::string spacer = " ";
+    
     std::string indentOffset;
     for(int i = 0; i < indentLevel; i++)
-        indentOffset += "\t";
+        indentOffset += "    ";
     std::cout << "writing chunk " << chnk.chunkName << "\n";
     if(chnk.getChunkType() == ChumpDataType::Null)
         return;
 
+    //Trainz does this
+    if (chnk.getChunkType() == ChumpDataType::Soup && indentLevel == 0)
+        str << "\n";
+
     str << indentOffset << chnk.chunkName;
+
+    std::string spacer = " ";
+    int spacesLeft = 40 - (indentOffset.size() + chnk.chunkName.size());
+    if (spacesLeft > 1)
+    {
+        for (int i = 1; i < spacesLeft; i++)
+            spacer += " ";
+    }
+
     std::shared_ptr<ChumpData> chnkdata = chnk.getData();
     switch(chnk.getChunkType())
     {
@@ -34,7 +47,7 @@ void writeChunk(std::ofstream& str, ChumpChunk& chnk, int indentLevel = 0)
         for(int i = 0; i < data->values.size(); i++)
         {
             if(i > 0)
-                str << ", ";
+                str << ",";
 
             const auto& val = data->values[i];
             str << val;
@@ -49,7 +62,7 @@ void writeChunk(std::ofstream& str, ChumpChunk& chnk, int indentLevel = 0)
         for(int i = 0; i < data->values.size(); i++)
         {
             if(i > 0)
-                str << ", ";
+                str << ",";
 
             const auto& val = data->values[i];
             str << val;
@@ -100,7 +113,7 @@ int main(int argc, char* argv[])
     }
     //const char* filename = argv[1];
     std::filesystem::path filepath(argv[1]);
-    std::string outpath = filepath.replace_extension("config.txt").string();
+    std::string outpath = filepath.replace_extension(".txt").string();
 
     auto test = chump_read(argv[1]);
 

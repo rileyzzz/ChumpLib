@@ -279,6 +279,9 @@ bool ChumpKUID::Serialize(IOArchive& Ar, size_t datasize)
     Ar << KUID._high;
     Ar << KUID._low;
 
+    if ((KUID.version & 0b1111111) == 0b1111111)
+        KUID.version = 0;
+
     //std::cout << "kuidsize " << sizeof(KUIDdata) << "\n";
     //std::cout << "kuid data userid " << (int)KUID.userid << " contentid " << (int)KUID.contentid << " version " << (int)KUID.version << "\n";
     //std::cout << "userid " << (int)KUID.userid << " contentid " << (int)KUID.contentid << " version " << (int)KUID.version << "\n";
