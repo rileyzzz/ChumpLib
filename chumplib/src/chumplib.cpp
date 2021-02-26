@@ -11,3 +11,8 @@ CHUMPLIB_API ChumpFile chump_read(const char* file)
 
 	//MessageBoxA(0, "done", "done", MB_OK);
 }
+
+CHUMPLIB_API TZarcFile tzarc_read(const char* file)
+{
+	return TZarcFile::read(file);
+}

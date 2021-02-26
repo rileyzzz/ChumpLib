@@ -3,11 +3,13 @@ project(chumplib VERSION 1.0)
 
 set(LIBRARY_HEADERS
 	include/chumplib.h
-	include/chumpfile.h)
+	include/chumpfile.h
+	include/tzarcfile.h)
 
 set(LIBRARY_SOURCES
 	src/chumplib.cpp
 	src/chumpfile.cpp
+	src/tzarcfile.cpp
 	src/IOArchive.h)
 
 add_library(chumplib STATIC ${LIBRARY_SOURCES} ${LIBRARY_HEADERS})

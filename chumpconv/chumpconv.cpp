@@ -97,6 +97,9 @@ void writeConfig(std::ofstream& str, ChumpFile& file)
 
 int main(int argc, char* argv[])
 {
+    tzarc_read("C:/Users/10447696/Desktop/TRS19/Install/resources/builtin/46472/content/kuid2 661281 200019 8.tzarc");
+    return 0;
+
     if(argc == 1)
     {
         std::cout << "USAGE: chumpconv config.chump\n";

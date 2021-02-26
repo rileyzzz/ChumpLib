@@ -1,5 +1,6 @@
 
 #include "chumpfile.h"
+#include "tzarcfile.h"
 
 #ifndef _CHUMPLIB_H_
 #define _CHUMPLIB_H_
@@ -15,5 +16,6 @@
 #endif
 
 extern "C++" CHUMPLIB_API ChumpFile chump_read(const char* file);
+extern "C++" CHUMPLIB_API TZarcFile tzarc_read(const char* file);
 
 #endif //_CHUMPLIB_H_
