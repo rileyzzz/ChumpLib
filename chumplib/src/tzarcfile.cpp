@@ -64,8 +64,12 @@ bool TZArchive::Serialize(IOArchive& Ar)
     {
         auto& file = files[i];
         SerializeCondensedString(Ar, file.name);
+
+        //compression?
         uint32_t unknown = 0;
         Ar << unknown;
+        unknown = bswap_32(unknown);
+        std::cout << "unknown value " << unknown << "\n";
 
         file.filesize = bswap_32(file.filesize);
         Ar << file.filesize;
@@ -74,8 +78,11 @@ bool TZArchive::Serialize(IOArchive& Ar)
         std::cout << "file " << file.name << " size " << file.filesize << "\n";
     }
 
+    //crc?
     uint32_t unknown2 = 0;
     Ar << unknown2;
+    unknown2 = bswap_32(unknown2);
+    std::cout << "unknown 2 " << unknown2 << "\n";
 
     //read file data
     for(int i = 0; i < filecount; i++)
@@ -83,7 +90,7 @@ bool TZArchive::Serialize(IOArchive& Ar)
         auto& file = files[i];
         file.filedata = new char[file.filesize];
         Ar.Serialize(file.filedata, file.filesize);
-        std::cout << "read file data for " << file.name << ", fstream position " << Ar.tell() << "\n";
+        //std::cout << "read file data for " << file.name << ", fstream position " << Ar.tell() << "\n";
     }
     return true;
 }

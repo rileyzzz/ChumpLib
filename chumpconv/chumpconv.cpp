@@ -106,21 +106,21 @@ void writeConfig(std::ofstream& str, ChumpFile& file)
 
 int main(int argc, char* argv[])
 {
-    // auto arc = tzarc_read(argv[1]);
-    // std::string outdir = argv[1];
-    // outdir = outdir.substr(0, outdir.find_last_of('.'));
-    // mkdir(outdir.c_str());
+    auto arc = tzarc_read(argv[1]);
+    std::string outdir = argv[1];
+    outdir = outdir.substr(0, outdir.find_last_of('.'));
+    mkdir(outdir.c_str());
 
-    // std::cout << "read finished\n";
-    // for(const auto& file : arc.files)
-    // {
-    //     std::string fpath = outdir + "/" + file.name;
-    //     std::cout << "write to " << fpath << "\n";
-    //     std::ofstream out(fpath.c_str(), std::ofstream::out);
-    //     out.write(file.filedata, file.filesize);
-    //     out.close();
-    // }
-    // return 0;
+    std::cout << "read finished\n";
+    for(const auto& file : arc.files)
+    {
+        std::string fpath = outdir + "/" + file.name;
+        //std::cout << "write to " << fpath << "\n";
+        std::ofstream out(fpath.c_str(), std::ofstream::out);
+        out.write(file.filedata, file.filesize);
+        out.close();
+    }
+    return 0;
 
     if(argc == 1)
     {
