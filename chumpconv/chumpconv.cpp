@@ -1,17 +1,18 @@
 #include <iostream>
 #include <fstream>
-#include <filesystem>
+//#include <filesystem>
+//#include <experimental/filesystem>
 #include <cstring>
 #include <chumplib.h>
 
 void writeChunk(std::ofstream& str, ChumpChunk& chnk, int indentLevel = 0)
 {
-    
+
     std::string indentOffset;
     for(int i = 0; i < indentLevel; i++)
         indentOffset += "    ";
     std::cout << "writing chunk " << chnk.chunkName << "\n";
-    if(chnk.getChunkType() == ChumpDataType::Null)
+    if(chnk.getChunkType() == ChumpDataType::Null || chnk.getChunkType() == ChumpDataType::Raw || chnk.getChunkType() == ChumpDataType::RawAligned)
         return;
 
     //Trainz does this
@@ -112,13 +113,15 @@ int main(int argc, char* argv[])
         return 0;
     }
     //const char* filename = argv[1];
-    std::filesystem::path filepath(argv[1]);
-    std::string outpath = filepath.replace_extension(".txt").string();
+    //std::filesystem::path filepath(argv[1]);
+    //std::string outpath = filepath.replace_extension(".txt").string();
+    std::string outpath = argv[1];
+    outpath = outpath.substr(0, outpath.find_last_of('.')) + ".txt";
 
     auto test = chump_read(argv[1]);
 
     std::ofstream out(outpath.c_str(), std::ofstream::out);
     writeConfig(out, test);
     out.close();
-    
+
 }
