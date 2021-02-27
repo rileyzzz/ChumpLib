@@ -4,7 +4,7 @@
 //#include <experimental/filesystem>
 #include <sys/stat.h>
 
-#ifdef WIN_32
+#ifdef _MSC_VER
 #include <direct.h>
 #define mkdir(x) _mkdir(x)
 #else
@@ -115,9 +115,10 @@ int main(int argc, char* argv[])
     for(const auto& file : arc.files)
     {
         std::string fpath = outdir + "/" + file.name;
-        //std::cout << "write to " << fpath << "\n";
-        std::ofstream out(fpath.c_str(), std::ofstream::out);
+        std::cout << "write to " << fpath << "\n";
+        std::ofstream out(fpath.c_str(), std::ios::out | std::ios::binary);
         out.write(file.filedata, file.filesize);
+        //out.write(reinterpret_cast<char*>(file.filedata), file.filesize);
         out.close();
     }
     return 0;
