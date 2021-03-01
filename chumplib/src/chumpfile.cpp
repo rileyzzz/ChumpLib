@@ -114,13 +114,41 @@ ChumpFile ChumpFile::parseTXT(const char* path)
     str.close();
 
     //(?:^\\s*([\\w_-]+)\\s+(?:(?:([\\w_,.<>:-]+)|\"([^\"]+)\")|((?:{|})))?\\s*\\n)
+    //(?:^\s*([\w_-]+)\s+(?:(?:([\w_,.<>:-]+)|\"([^\"]+)\")|({))|(}))
+    std::regex re(R"((?:(?:^|\n)\s*([\w_\-]+)\s+(?:([\w_,.<>:-]+)|\"([^\"]+)\")|(\{)|(\})))");
 
-    //std::regex re("(?:^\\s*([\\w_-]+)\\s+(?:(?:([\\w_,.<>:-]+)|\"([^\"]+)\")|((?:{|})))?\\s*\\n)", std::regex::ECMAScript);
-    std::regex re("[\\w_-]+", std::regex::ECMAScript);
+    //active container hierarchy
+    std::vector<std::vector<ChumpChunk>*> containers = { &newFile.rootData };
     for (auto it = std::sregex_iterator(filedata.begin(), filedata.end(), re); it != std::sregex_iterator(); it++)
     {
         std::smatch m = *it;
-        std::cout << "line match " << m[1] << ", " << m[2] << ", " << m[3] << "\n";
+        std::string g1 = m[1], g2 = m[2], g3 = m[3], g4 = m[4], g5 = m[5];
+
+        if(g1.size() && (g2.size() || g3.size()))
+        {
+            std::string value = (g2.size() ? g2 : g3);
+
+            //value validation?
+            ChumpChunk chnk(g1);
+            chnk.setData(std::shared_ptr<ChumpText>(new ChumpText(value)));
+            containers.back()->push_back(chnk);
+
+            //std::cout << "data " << g1 << " val " << value << "\n";
+        }
+        else if (g4 == "{")
+        {
+            ChumpChunk chnk(g1);
+            std::shared_ptr<ChumpSoup> container = std::shared_ptr<ChumpSoup>(new ChumpSoup());
+            chnk.setData(container);
+            containers.back()->push_back(chnk);
+
+            containers.push_back(&container->children);
+            std::cout << "container " << g1 << "\n";
+        }
+        else if (g5 == "}")
+        {
+            containers.pop_back();
+        }
     }
     //while (std::regex_match(filedata, m, re))
     //{
@@ -244,7 +272,7 @@ bool ChumpChunk::Serialize(IOArchive& Ar)
 
     SerializeString(Ar, chunkName);
     Ar << chunkType;
-    
+
     //std::cout << "data begin " << (int)Ar.tellg() << " name " << chunkName << " type " << (int)chunkType << "\n";
 
     if (Ar.IsLoading())

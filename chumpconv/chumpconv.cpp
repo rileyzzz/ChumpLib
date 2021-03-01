@@ -4,7 +4,7 @@
 //#include <experimental/filesystem>
 #include <sys/stat.h>
 
-#ifdef _MSC_VER
+#ifdef _WIN32
 #include <direct.h>
 #define mkdir(x) _mkdir(x)
 #else
@@ -17,7 +17,7 @@
 
 int main(int argc, char* argv[])
 {
-    ChumpFile::parseTXT("G:/Games/N3V/trs19/build hhl1hrpw1/editing/kuid -25 1173 class43 interior/config.txt");
+    ChumpFile::parseTXT("C:/Users/10447696/Desktop/TRS19/LocalData/build axxd6n351/editing/kuid -25 1297 EMD Hood Unit Interior/config.txt");
     return 0;
 
     auto arc = tzarc_read(argv[1]);

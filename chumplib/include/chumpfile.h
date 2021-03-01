@@ -46,16 +46,14 @@ class ChumpSoup : public ChumpData
 public:
     std::vector<ChumpChunk> children;
 
-private:
-    //private constructor
     ChumpSoup() {}
 
-public:
     bool Serialize(class IOArchive& Ar, size_t datasize);
     int size();
 
     ChumpSoup(std::vector<ChumpChunk> chunks) : children(chunks) { }
     friend class ChumpChunk;
+    friend class ChumpFile;
 };
 
 class ChumpInteger : public ChumpData
@@ -214,7 +212,7 @@ public:
 
     inline void setData(std::shared_ptr<ChumpSoup> in_data)        { chunkType = ChumpDataType::Soup; data = in_data; }
     inline void setData(std::shared_ptr<ChumpInteger> in_data)     { chunkType = ChumpDataType::Integer; data = in_data; }
-    inline void setData(std::shared_ptr<ChumpFloat> in_data)       { chunkType = ChumpDataType::Float; data = in_data; }     
+    inline void setData(std::shared_ptr<ChumpFloat> in_data)       { chunkType = ChumpDataType::Float; data = in_data; }
     inline void setData(std::shared_ptr<ChumpText> in_data)        { chunkType = ChumpDataType::Text; data = in_data; }
     inline void setData(std::shared_ptr<ChumpRaw> in_data)         { chunkType = ChumpDataType::Raw; data = in_data; }
     inline void setData(std::shared_ptr<ChumpNull> in_data)        { chunkType = ChumpDataType::Null; data = in_data; }
