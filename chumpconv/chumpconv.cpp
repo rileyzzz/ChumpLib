@@ -17,6 +17,9 @@
 
 int main(int argc, char* argv[])
 {
+    ChumpFile::parseTXT("G:/Games/N3V/trs19/build hhl1hrpw1/editing/kuid -25 1173 class43 interior/config.txt");
+    return 0;
+
     auto arc = tzarc_read(argv[1]);
     std::string outdir = argv[1];
     outdir = outdir.substr(0, outdir.find_last_of('.'));

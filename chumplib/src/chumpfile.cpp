@@ -1,5 +1,7 @@
 #include <iostream>
 #include <bitset>
+#include <sstream>
+#include <regex>
 #include "chumpfile.h"
 #include "IOArchive.h"
 
@@ -92,6 +94,45 @@ ChumpFile ChumpFile::read(const char* path)
     IOArchive Ar(path, IODirection::Import);
 	if(!newFile.Serialize(Ar))
 		std::cout << "Encountered file read error at offset " << Ar.tell() << "\n";
+
+    return newFile;
+}
+
+ChumpFile ChumpFile::parseTXT(const char* path)
+{
+    ChumpFile newFile;
+
+    //std::vector<std::string> lines;
+    std::string filedata;
+    std::ifstream str(path, std::ios::in);
+    //std::string line;
+    //while (std::getline(str, line))
+    //    lines.push_back(line);
+    std::stringstream buf;
+    buf << str.rdbuf();
+    filedata = buf.str();
+    str.close();
+
+    //(?:^\\s*([\\w_-]+)\\s+(?:(?:([\\w_,.<>:-]+)|\"([^\"]+)\")|((?:{|})))?\\s*\\n)
+
+    //std::regex re("(?:^\\s*([\\w_-]+)\\s+(?:(?:([\\w_,.<>:-]+)|\"([^\"]+)\")|((?:{|})))?\\s*\\n)", std::regex::ECMAScript);
+    std::regex re("[\\w_-]+", std::regex::ECMAScript);
+    for (auto it = std::sregex_iterator(filedata.begin(), filedata.end(), re); it != std::sregex_iterator(); it++)
+    {
+        std::smatch m = *it;
+        std::cout << "line match " << m[1] << ", " << m[2] << ", " << m[3] << "\n";
+    }
+    //while (std::regex_match(filedata, m, re))
+    //{
+
+    //}
+    //for (const std::string& l : lines)
+    //{
+    //    std::smatch m;
+    //    std::regex_match(l, m, re);
+    //    std::cout << "line match " << m[1] << ", " << m[2] << ", " << m[3] << "\n";
+    //}
+    //std::cout << lines.size() << "lines\n";
 
     return newFile;
 }

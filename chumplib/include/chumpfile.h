@@ -240,6 +240,7 @@ private:
     bool Serialize(class IOArchive& Ar);
 public:
     static ChumpFile read(const char* path);
+    static ChumpFile parseTXT(const char* path);
 
     void save(const char* path);
     void exportTXT(const char* path);
