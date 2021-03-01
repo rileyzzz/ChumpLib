@@ -34,7 +34,7 @@ private:
 public:
     static TZArchive read(const char* path);
 
-    void save(const char* path);
+    //void save(const char* path);
 
     TZArchive() { }
 };

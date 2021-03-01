@@ -3,6 +3,89 @@
 #include "chumpfile.h"
 #include "IOArchive.h"
 
+void writeChunk(std::ofstream& str, ChumpChunk& chnk, int indentLevel = 0)
+{
+    std::string indentOffset;
+    for (int i = 0; i < indentLevel; i++)
+        indentOffset += "    ";
+    std::cout << "writing chunk " << chnk.chunkName << "\n";
+    if (chnk.getChunkType() == ChumpDataType::Null || chnk.getChunkType() == ChumpDataType::Raw || chnk.getChunkType() == ChumpDataType::RawAligned)
+        return;
+
+    //Trainz does this
+    if (chnk.getChunkType() == ChumpDataType::Soup && indentLevel == 0)
+        str << "\n";
+
+    str << indentOffset << chnk.chunkName;
+
+    std::string spacer = " ";
+    int spacesLeft = 40 - (indentOffset.size() + chnk.chunkName.size());
+    if (spacesLeft > 1)
+    {
+        for (int i = 1; i < spacesLeft; i++)
+            spacer += " ";
+    }
+
+    std::shared_ptr<ChumpData> chnkdata = chnk.getData();
+    switch (chnk.getChunkType())
+    {
+    case ChumpDataType::Soup:
+    {
+        auto data = std::dynamic_pointer_cast<ChumpSoup>(chnkdata);
+        str << "\n" << indentOffset << "{\n";
+        for (auto& child : data->children)
+            writeChunk(str, child, indentLevel + 1);
+        str << indentOffset << "}\n";
+        break;
+    }
+    case ChumpDataType::Integer:
+    {
+        auto data = std::dynamic_pointer_cast<ChumpInteger>(chnkdata);
+        str << spacer;
+        for (int i = 0; i < data->values.size(); i++)
+        {
+            if (i > 0)
+                str << ",";
+
+            const auto& val = data->values[i];
+            str << val;
+        }
+        str << "\n";
+        break;
+    }
+    case ChumpDataType::Float:
+    {
+        auto data = std::dynamic_pointer_cast<ChumpFloat>(chnkdata);
+        str << spacer;
+        for (int i = 0; i < data->values.size(); i++)
+        {
+            if (i > 0)
+                str << ",";
+
+            const auto& val = data->values[i];
+            str << val;
+        }
+        str << "\n";
+        break;
+    }
+    case ChumpDataType::Text:
+    {
+        auto data = std::dynamic_pointer_cast<ChumpText>(chnkdata);
+        str << spacer << "\"" << data->value << "\"\n";
+        break;
+    }
+    case ChumpDataType::KUID:
+    {
+        auto data = std::dynamic_pointer_cast<ChumpKUID>(chnkdata);
+        str << spacer << data->KUID.KUIDstr() << "\n";
+        break;
+    }
+    default:
+        std::cout << "unknown chunk type " << (int)chnk.getChunkType() << "\n";
+        break;
+    }
+}
+
 ChumpFile ChumpFile::read(const char* path)
 {
     ChumpFile newFile;
@@ -18,6 +101,14 @@ void ChumpFile::save(const char* path)
     IOArchive Ar(path, IODirection::Export);
 	if(!Serialize(Ar))
 		std::cout << "Encountered file write error at offset " << Ar.tell() << "\n";
+}
+
+void ChumpFile::exportTXT(const char* path)
+{
+    std::ofstream out(path, std::ofstream::out);
+    for (auto& data : rootData)
+        writeChunk(out, data);
+    out.close();
 }
 
 bool ChumpFile::Serialize(IOArchive& Ar)

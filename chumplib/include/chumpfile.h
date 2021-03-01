@@ -201,7 +201,7 @@ public:
     std::string chunkName;
 
 private:
-    ChumpDataType chunkType;
+    ChumpDataType chunkType = ChumpDataType::Null;
     std::shared_ptr<ChumpData> data;
 
     ChumpChunk() { }
@@ -242,6 +242,7 @@ public:
     static ChumpFile read(const char* path);
 
     void save(const char* path);
+    void exportTXT(const char* path);
 
     ChumpFile() { }
 };
