@@ -115,8 +115,16 @@ ChumpFile ChumpFile::parseTXT(const char* path)
 
     //(?:^\\s*([\\w_-]+)\\s+(?:(?:([\\w_,.<>:-]+)|\"([^\"]+)\")|((?:{|})))?\\s*\\n)
     //(?:^\s*([\w_-]+)\s+(?:(?:([\w_,.<>:-]+)|\"([^\"]+)\")|({))|(}))
-    std::regex re(R"((?:(?:^|\n)\s*([\w_\-]+)\s+(?:([\w_,.<>:-]+)|\"([^\"]+)\")|(\{)|(\})))");
+    //std::regex re(R"((?:(?:^|\n)\s*([\w_\-]+)\s+(?:([\w_,.<>:-]+)|\"([^\"]+)\")|(\{)|(\})))");
+    std::regex re(R"((?:\s*([\w_\-]+)\s+(?:([\w_,.<>:-]+)|\"([^\"]+)\"|(\{))||(\}))(?:$|\n))");
 
+    //will check for floating point values
+    std::regex floatre(R"([-+]?(?:[0-9]+\.[0-9]*|\.[0-9]+).*)");
+    //will check for integer values
+    std::regex intre(R"([-+]?[0-9]+[^\n.]*)");
+    //regex comma separated list delimiter
+    std::regex listre(R"(\s*,\s*)");
+    //(?:^|\n)
     //active container hierarchy
     std::vector<std::vector<ChumpChunk>*> containers = { &newFile.rootData };
     for (auto it = std::sregex_iterator(filedata.begin(), filedata.end(), re); it != std::sregex_iterator(); it++)
@@ -128,9 +136,53 @@ ChumpFile ChumpFile::parseTXT(const char* path)
         {
             std::string value = (g2.size() ? g2 : g3);
 
-            //value validation?
             ChumpChunk chnk(g1);
-            chnk.setData(std::shared_ptr<ChumpText>(new ChumpText(value)));
+            //value validation?
+
+            //g3 group surrounded by quotes, automatic text
+            if (g3.size())
+                chnk.setData(std::shared_ptr<ChumpText>(new ChumpText(value)));
+            else
+            {
+                //disambiguate type
+                if (value.rfind("<kuid", 0) == 0)
+                {
+                    chnk.setData(std::shared_ptr<ChumpKUID>(new ChumpKUID(value)));
+                }
+                else if (value.find(".") != std::string::npos) //there can be lists with both int and float, convert these to floatlists
+                {
+                    //floating point
+                    if (value.find(",") != std::string::npos)
+                    {
+                        //std::cout << "floatlist " << value << "\n";
+                        //list of values
+                        std::vector<float> values;
+                        for (auto it = std::sregex_token_iterator(value.begin(), value.end(), listre, -1); it != std::sregex_token_iterator(); it++)
+                            values.push_back(std::stof(it->str()));
+                        chnk.setData(std::shared_ptr<ChumpFloat>(new ChumpFloat(values)));
+                    }
+                    else chnk.setData(std::shared_ptr<ChumpFloat>(new ChumpFloat(std::stof(value))));
+                }
+                else if (std::regex_match(value, intre))
+                {
+                    //integer
+                    if (value.find(",") != std::string::npos)
+                    {
+                        //std::cout << "floatlist " << value << "\n";
+                        //list of values
+                        std::vector<int> values;
+                        for (auto it = std::sregex_token_iterator(value.begin(), value.end(), listre, -1); it != std::sregex_token_iterator(); it++)
+                            values.push_back(std::stoi(it->str()));
+                        chnk.setData(std::shared_ptr<ChumpInteger>(new ChumpInteger(values)));
+                    }
+                    else chnk.setData(std::shared_ptr<ChumpInteger>(new ChumpInteger(std::stoi(value))));
+                }
+                else
+                {
+                    std::cout << "NO MATCH " << value << "\n";
+                }
+            }
+
             containers.back()->push_back(chnk);
 
             //std::cout << "data " << g1 << " val " << value << "\n";
@@ -143,11 +195,12 @@ ChumpFile ChumpFile::parseTXT(const char* path)
             containers.back()->push_back(chnk);
 
             containers.push_back(&container->children);
-            std::cout << "container " << g1 << "\n";
+            //std::cout << "container " << g1 << "\n";
         }
         else if (g5 == "}")
         {
             containers.pop_back();
+            //std::cout << "end container\n";
         }
     }
     //while (std::regex_match(filedata, m, re))
@@ -452,4 +505,30 @@ bool ChumpKUID::Serialize(IOArchive& Ar, size_t datasize)
     //std::cout << std::bitset<32>(KUID._low) << "\n";
     std::cout << KUID.KUIDstr() << "\n";
     return true;
+}
+
+ChumpKUID::ChumpKUID(std::string data)
+{
+    std::regex re(":");
+    std::vector<std::string> matches;
+    for (auto it = std::sregex_token_iterator(data.begin(), data.end(), re, -1); it != std::sregex_token_iterator(); it++)
+        matches.push_back(it->str());
+
+    if (matches[0] == "<kuid" && matches.size() == 3)
+    {
+        KUID.userid = std::stoi(matches[1]);
+        //remove trailing >
+        matches[2].resize(matches[2].size() - 1);
+        KUID.contentid = std::stoi(matches[2]);
+    }
+    else if (matches[0] == "<kuid2" && matches.size() == 4)
+    {
+        KUID.userid = std::stoi(matches[1]);
+        KUID.contentid = std::stoi(matches[2]);
+
+        //remove trailing >
+        matches[3].resize(matches[3].size() - 1);
+        KUID.version = std::stoi(matches[3]);
+    }
+    else throw new std::exception("Invalid KUID data!");
 }

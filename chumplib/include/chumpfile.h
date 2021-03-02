@@ -188,6 +188,7 @@ public:
     int size() { return 8; }
 
     ChumpKUID(int32_t userid, int32_t contentid, uint8_t revision = 0) : KUID(userid, contentid, revision) { }
+    ChumpKUID(std::string data);
 
     friend class ChumpChunk;
 };
