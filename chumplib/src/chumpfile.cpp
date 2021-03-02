@@ -2,6 +2,7 @@
 #include <bitset>
 #include <sstream>
 #include <regex>
+#include <exception>
 #include "chumpfile.h"
 #include "IOArchive.h"
 
@@ -116,7 +117,7 @@ ChumpFile ChumpFile::parseTXT(const char* path)
     //(?:^\\s*([\\w_-]+)\\s+(?:(?:([\\w_,.<>:-]+)|\"([^\"]+)\")|((?:{|})))?\\s*\\n)
     //(?:^\s*([\w_-]+)\s+(?:(?:([\w_,.<>:-]+)|\"([^\"]+)\")|({))|(}))
     //std::regex re(R"((?:(?:^|\n)\s*([\w_\-]+)\s+(?:([\w_,.<>:-]+)|\"([^\"]+)\")|(\{)|(\})))");
-    std::regex re(R"((?:\s*([\w_\-]+)\s+(?:([\w_,.<>:-]+)|\"([^\"]+)\"|(\{))||(\}))(?:$|\n))");
+    std::regex re(R"((?:\s*([\w_\-]+)\s+(?:([\w_,.<>:-]+)|\"([^\"]+)\"|(\{))|(\}))(?:$|\n))");
 
     //will check for floating point values
     std::regex floatre(R"([-+]?(?:[0-9]+\.[0-9]*|\.[0-9]+).*)");
@@ -530,5 +531,5 @@ ChumpKUID::ChumpKUID(std::string data)
         matches[3].resize(matches[3].size() - 1);
         KUID.version = std::stoi(matches[3]);
     }
-    else throw new std::exception("Invalid KUID data!");
+    else throw "Invalid KUID data!";
 }

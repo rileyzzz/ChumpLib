@@ -17,9 +17,9 @@
 
 int main(int argc, char* argv[])
 {
-    //ChumpFile::parseTXT("C:/Users/10447696/Desktop/TRS19/LocalData/build axxd6n351/editing/kuid -25 1297 EMD Hood Unit Interior/config.txt");
-    auto testcfg = ChumpFile::parseTXT("G:/Games/N3V/trs19/build hhl1hrpw1/editing/kuid -25 1297 EMD Hood Unit Interior/config.txt");
-    testcfg.exportTXT("G:/Games/N3V/trs19/build hhl1hrpw1/editing/kuid -25 1297 EMD Hood Unit Interior/testconfig.txt");
+    auto testcfg = ChumpFile::parseTXT("C:/Users/10447696/Desktop/TRS19/LocalData/build axxd6n351/editing/kuid -25 1297 EMD Hood Unit Interior/config.txt");
+    //auto testcfg = ChumpFile::parseTXT("G:/Games/N3V/trs19/build hhl1hrpw1/editing/kuid -25 1297 EMD Hood Unit Interior/config.txt");
+    testcfg.exportTXT("C:/Users/10447696/Desktop/TRS19/LocalData/build axxd6n351/editing/kuid -25 1297 EMD Hood Unit Interior/testconfig.txt");
     return 0;
 
     auto arc = tzarc_read(argv[1]);
